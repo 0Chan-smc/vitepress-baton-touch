@@ -1,0 +1,13 @@
+# cp terraform.tfvars.example terraform.tfvars 후 값을 채운다. (terraform.tfvars 는 git 에서 제외됨)
+project_name = "handover-docs"
+aws_region   = "ap-northeast-2"
+bucket_name  = "my-handover-docs-bucket"
+
+basic_auth_user     = "handover"
+basic_auth_password = "change-me"
+
+# 커스텀 도메인 사용 시 (인증서는 us-east-1 에 발급)
+# domain_aliases      = ["docs.example.com"]
+# acm_certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/xxxx"
+
+# price_class = "PriceClass_200"

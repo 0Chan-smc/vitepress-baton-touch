@@ -1,0 +1,32 @@
+// CloudFront Function (cloudfront-js-2.0), viewer-request
+// 1) Basic Auth 검사  2) VitePress cleanUrls 대응 URI 재작성
+// 이 파일은 Terraform templatefile()로 렌더링된다. JS 템플릿 리터럴(백틱)은 쓰지 말 것.
+var EXPECTED_AUTH = 'Basic ${basic_auth}';
+
+function handler(event) {
+  var request = event.request;
+  var headers = request.headers;
+
+  if (!headers.authorization || headers.authorization.value !== EXPECTED_AUTH) {
+    return {
+      statusCode: 401,
+      statusDescription: 'Unauthorized',
+      headers: {
+        'www-authenticate': { value: 'Basic realm="Restricted", charset="UTF-8"' },
+        'cache-control': { value: 'no-store' }
+      }
+    };
+  }
+
+  var uri = request.uri;
+  if (uri.endsWith('/')) {
+    request.uri = uri + 'index.html';
+  } else {
+    var lastSegment = uri.substring(uri.lastIndexOf('/') + 1);
+    if (lastSegment.indexOf('.') === -1) {
+      request.uri = uri + '.html';
+    }
+  }
+
+  return request;
+}

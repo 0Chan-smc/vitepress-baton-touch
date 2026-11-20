@@ -1,0 +1,20 @@
+{
+  "name": "vitepress-baton-touch",
+  "version": "0.1.0",
+  "private": true,
+  "description": "VitePress 기반 인수인계 문서 템플릿 (S3 + CloudFront Basic Auth 배포)",
+  "type": "module",
+  "scripts": {
+    "docs:dev": "vitepress dev",
+    "docs:build": "vitepress build",
+    "docs:preview": "vitepress preview",
+    "test:cf": "node scripts/test-cf-function.mjs",
+    "deploy": "bash scripts/deploy.sh"
+  },
+  "devDependencies": {
+    "vitepress": "^1.6.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
