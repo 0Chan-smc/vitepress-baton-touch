@@ -96,6 +96,16 @@ variable "github_deploy_branch" {
   default     = "main"
 }
 
+variable "github_oidc_subject_prefix" {
+  description = <<-EOT
+    GitHub OIDC 토큰 sub 접두사. 비워두면 "repo:<github_repository>".
+    저장소가 immutable subject 를 쓰면 ID 가 포함된 값이 필요하다. 확인 방법:
+      gh api repos/<owner>/<repo>/actions/oidc/customization/sub --jq .sub_claim_prefix
+  EOT
+  type        = string
+  default     = ""
+}
+
 variable "create_github_oidc_provider" {
   description = "계정에 GitHub OIDC provider 가 없을 때만 true (계정당 1개, 이미 있으면 false 로 두고 참조)"
   type        = bool

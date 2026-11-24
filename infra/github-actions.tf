@@ -7,6 +7,7 @@
 locals {
   gh_deploy_enabled = var.github_repository != ""
   gh_oidc_host      = "token.actions.githubusercontent.com"
+  gh_subject_prefix = var.github_oidc_subject_prefix != "" ? var.github_oidc_subject_prefix : "repo:${var.github_repository}"
   gh_oidc_provider_arn = local.gh_deploy_enabled ? (
     var.create_github_oidc_provider
     ? aws_iam_openid_connect_provider.github[0].arn
@@ -45,10 +46,11 @@ data "aws_iam_policy_document" "github_deploy_trust" {
     }
 
     # 지정한 저장소의 배포 브랜치에서 실행된 워크플로만 허용
+    # GitHub 가 immutable subject(소유자·저장소 ID 포함)를 쓰면 github_oidc_subject_prefix 로 지정
     condition {
       test     = "StringEquals"
       variable = "${local.gh_oidc_host}:sub"
-      values   = ["repo:${var.github_repository}:ref:refs/heads/${var.github_deploy_branch}"]
+      values   = ["${local.gh_subject_prefix}:ref:refs/heads/${var.github_deploy_branch}"]
     }
   }
 }

@@ -114,6 +114,10 @@ gh variable set CHAT_LAMBDA_NAME     --body "$(terraform output -raw chat_lambda
 
 `DOCS_DEPLOY_ROLE_ARN` 변수가 없으면 워크플로는 실패하지 않고 건너뜁니다.
 
+- 배포 단계에서 `Not authorized to perform sts:AssumeRoleWithWebIdentity`가 나면, 저장소가 GitHub immutable subject(소유자·저장소 ID 포함)를 쓰는 경우입니다. 아래 값을 `github_oidc_subject_prefix`에 넣고 다시 apply합니다.
+  `gh api repos/<owner>/<repo>/actions/oidc/customization/sub --jq .sub_claim_prefix`
+- 실제 문서를 배포하는 저장소는 **private**으로 둡니다. public 저장소는 Actions 로그를 누구나 볼 수 있어, 계정 ID·버킷명·문서 파일 경로가 노출됩니다.
+
 **수동 배포**: 로컬에서 바로 올릴 때 씁니다.
 
 ```bash

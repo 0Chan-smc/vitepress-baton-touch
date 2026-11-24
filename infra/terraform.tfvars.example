@@ -22,3 +22,5 @@ basic_auth_password = "change-me"
 # github_repository           = "my-org/my-handover-docs"
 # github_deploy_branch        = "main"
 # create_github_oidc_provider = false   # 계정에 GitHub OIDC provider 가 없을 때만 true
+# github_oidc_subject_prefix  = ""      # immutable subject 저장소면 아래 명령 결과로 설정
+#   gh api repos/<owner>/<repo>/actions/oidc/customization/sub --jq .sub_claim_prefix
