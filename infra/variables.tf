@@ -80,3 +80,24 @@ variable "chat_effort" {
     error_message = "chat_effort 는 low, medium, high, xhigh, max 중 하나여야 합니다."
   }
 }
+
+# ---------------------------------------------------------------------------
+# GitHub Actions 문서 배포 (github-actions.tf)
+# ---------------------------------------------------------------------------
+variable "github_repository" {
+  description = "자동 배포할 GitHub 저장소 (owner/repo). 비워두면 배포 role 을 만들지 않음"
+  type        = string
+  default     = ""
+}
+
+variable "github_deploy_branch" {
+  description = "배포를 허용할 브랜치"
+  type        = string
+  default     = "main"
+}
+
+variable "create_github_oidc_provider" {
+  description = "계정에 GitHub OIDC provider 가 없을 때만 true (계정당 1개, 이미 있으면 false 로 두고 참조)"
+  type        = bool
+  default     = false
+}

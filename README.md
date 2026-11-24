@@ -89,6 +89,33 @@ aws secretsmanager put-secret-value \
 
 ### 3. 문서 배포
 
+**자동 배포 (GitHub Actions)**: `main`에 push하면 `.github/workflows/deploy-docs.yml`이 실행됩니다.
+
+- 동작 순서: 테스트 → 빌드 → S3 업로드 → CloudFront 무효화 → 챗봇 Lambda 문서 갱신
+- 실행 조건: `docs/`, `.vitepress/`, `scripts/`, `infra/lambda/src/`, `package*.json`이 바뀐 push. Actions 탭에서 수동 실행도 됩니다.
+- AWS 인증: 키 없이 GitHub OIDC로 배포 전용 role을 씁니다. 권한은 이 사이트의 S3, CloudFront, 챗봇 Lambda로만 한정됩니다.
+- 인프라 변경(`infra/*.tf`, `terraform.tfvars`)은 자동 배포하지 않습니다. 로컬에서 `npm run infra:apply`로 반영합니다.
+
+자동 배포 최초 설정 (1회):
+
+```bash
+# 1. infra/terraform.tfvars 에 저장소 지정 후 apply → 배포 role 생성
+#    github_repository = "my-org/my-handover-docs"
+#    (계정에 GitHub OIDC provider 가 없으면 create_github_oidc_provider = true)
+npm run infra:apply
+
+# 2. GitHub Actions 변수 등록
+cd infra
+gh variable set DOCS_DEPLOY_ROLE_ARN --body "$(terraform output -raw github_deploy_role_arn)"
+gh variable set S3_BUCKET            --body "$(terraform output -raw bucket_name)"
+gh variable set CF_DISTRIBUTION_ID   --body "$(terraform output -raw distribution_id)"
+gh variable set CHAT_LAMBDA_NAME     --body "$(terraform output -raw chat_lambda_name)"
+```
+
+`DOCS_DEPLOY_ROLE_ARN` 변수가 없으면 워크플로는 실패하지 않고 건너뜁니다.
+
+**수동 배포**: 로컬에서 바로 올릴 때 씁니다.
+
 ```bash
 npm run deploy
 ```

@@ -22,3 +22,8 @@ output "chat_lambda_name" {
   description = "챗봇 Lambda 함수 이름 (문서 배포 시 컨텍스트 갱신에 사용)"
   value       = var.chat_enabled ? aws_lambda_function.chat[0].function_name : null
 }
+
+output "github_deploy_role_arn" {
+  description = "GitHub Actions 문서 배포 role ARN (GitHub Variable DOCS_DEPLOY_ROLE_ARN 에 설정)"
+  value       = local.gh_deploy_enabled ? aws_iam_role.github_deploy[0].arn : null
+}

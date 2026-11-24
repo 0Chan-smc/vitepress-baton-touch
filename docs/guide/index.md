@@ -30,6 +30,12 @@ terraform apply
 
 ### 문서 배포
 
+::: tip main에 push하면 자동 배포됩니다
+문서를 고쳐 `main`에 push하면 GitHub Actions(`deploy-docs.yml`)가 테스트 후 자동으로 배포합니다. 보통 몇 분 안에 사이트에 반영됩니다. 진행 상황은 저장소의 Actions 탭에서 볼 수 있습니다.
+:::
+
+로컬에서 바로 올릴 때는 아래 명령을 씁니다.
+
 ```bash
 npm run deploy
 ```
