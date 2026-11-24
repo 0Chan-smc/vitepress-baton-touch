@@ -57,6 +57,7 @@ CLAUDE.md               Claude Code용 작성 규칙
   3. 홈(`docs/index.md`)에 카드를 추가합니다.
 - 새 페이지를 추가하면 `.vitepress/config.mts`의 `projectSidebar()`에도 등록하세요.
 - 이미지는 `docs/public/`에 넣고 `/파일명.png`로 참조합니다.
+- 본문 이미지는 클릭하면 확대 모달로 열립니다(viewer.js, `.vitepress/theme/image-viewer.ts`). 휠로 확대·축소, 드래그로 이동합니다. 링크로 감싼 이미지(`[![..](..)](..)`)는 모달 대신 링크로 동작합니다.
 
 ## 배포
 

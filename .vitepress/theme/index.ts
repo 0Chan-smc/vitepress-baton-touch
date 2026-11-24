@@ -3,6 +3,8 @@ import type { Theme } from 'vitepress'
 import { h } from 'vue'
 import ChatWidget from './components/ChatWidget.vue'
 import CopyPageButtons from './components/CopyPageButtons.vue'
+import { setupImageViewer } from './image-viewer'
+import './custom.css'
 
 export default {
   extends: DefaultTheme,
@@ -13,5 +15,9 @@ export default {
     }),
   enhanceApp({ app }) {
     app.component('CopyPageButtons', CopyPageButtons)
+  },
+  setup() {
+    // 본문 이미지 클릭 시 모달로 확대 보기
+    setupImageViewer()
   }
 } satisfies Theme

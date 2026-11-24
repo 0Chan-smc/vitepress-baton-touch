@@ -1,0 +1,9 @@
+/* 본문 이미지는 클릭하면 모달로 열린다 (image-viewer.ts) */
+.vp-doc img:not(a img) {
+  cursor: zoom-in;
+}
+
+/* 모달이 VitePress 상단 내비게이션보다 위에 오도록 */
+.viewer-container {
+  z-index: 200 !important;
+}
