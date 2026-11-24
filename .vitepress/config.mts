@@ -1,4 +1,60 @@
-import { defineConfig } from 'vitepress'
+import { defineConfig, type DefaultTheme } from 'vitepress'
+
+// 프로젝트 목록: 상단 탭과 프로젝트별 사이드바가 여기서 생성된다.
+// 새 프로젝트 추가 = docs/project-a 폴더를 복사하고 여기에 한 줄 추가.
+const projects = [
+  { slug: 'project-a', name: 'A 프로젝트' },
+  { slug: 'project-b', name: 'B 프로젝트' },
+  { slug: 'project-c', name: 'C 프로젝트' }
+]
+
+// 프로젝트 공통 사이드바 구성 (문서 구성이 다른 프로젝트는 여기서 분기)
+function projectSidebar({ slug }: { slug: string }): DefaultTheme.SidebarItem[] {
+  const b = `/${slug}`
+  return [
+    { text: '인수인계 요약', link: `${b}/` },
+    {
+      text: '개요',
+      items: [
+        { text: '프로젝트 소개', link: `${b}/overview/` },
+        { text: '아키텍처', link: `${b}/overview/architecture` },
+        { text: '기술 스택', link: `${b}/overview/tech-stack` }
+      ]
+    },
+    {
+      text: '환경 구성',
+      items: [
+        { text: '개발 환경', link: `${b}/setup/` },
+        { text: '계정 및 권한', link: `${b}/setup/accounts` },
+        { text: '저장소 목록', link: `${b}/setup/repositories` }
+      ]
+    },
+    {
+      text: '운영',
+      items: [
+        { text: '운영 개요', link: `${b}/operations/` },
+        { text: '배포', link: `${b}/operations/deploy` },
+        { text: '모니터링', link: `${b}/operations/monitoring` },
+        { text: '장애 대응', link: `${b}/operations/incident` }
+      ]
+    },
+    {
+      text: '업무 현황',
+      items: [
+        { text: '업무 개요', link: `${b}/tasks/` },
+        { text: '진행 중인 업무', link: `${b}/tasks/in-progress` },
+        { text: '알려진 이슈', link: `${b}/tasks/known-issues` }
+      ]
+    },
+    {
+      text: '기타',
+      items: [
+        { text: '연락처', link: `${b}/contacts` },
+        { text: 'FAQ', link: `${b}/faq` }
+      ]
+    }
+  ]
+}
 
 export default defineConfig({
   srcDir: 'docs',
@@ -10,56 +66,19 @@ export default defineConfig({
 
   themeConfig: {
     nav: [
-      { text: '개요', link: '/overview/' },
-      { text: '환경 구성', link: '/setup/' },
-      { text: '운영', link: '/operations/' },
-      { text: '업무 현황', link: '/tasks/' },
-      { text: '연락처', link: '/contacts' },
-      { text: 'FAQ', link: '/faq' }
+      ...projects.map((p) => ({
+        text: p.name,
+        link: `/${p.slug}/`,
+        activeMatch: `^/${p.slug}/`
+      })),
+      { text: '사이트 운영', link: '/guide/', activeMatch: '^/guide/' }
     ],
 
-    sidebar: [
-      {
-        text: '개요',
-        items: [
-          { text: '프로젝트 소개', link: '/overview/' },
-          { text: '아키텍처', link: '/overview/architecture' },
-          { text: '기술 스택', link: '/overview/tech-stack' }
-        ]
-      },
-      {
-        text: '환경 구성',
-        items: [
-          { text: '개발 환경', link: '/setup/' },
-          { text: '계정 및 권한', link: '/setup/accounts' },
-          { text: '저장소 목록', link: '/setup/repositories' }
-        ]
-      },
-      {
-        text: '운영',
-        items: [
-          { text: '운영 개요', link: '/operations/' },
-          { text: '배포', link: '/operations/deploy' },
-          { text: '모니터링', link: '/operations/monitoring' },
-          { text: '장애 대응', link: '/operations/incident' }
-        ]
-      },
-      {
-        text: '업무 현황',
-        items: [
-          { text: '업무 개요', link: '/tasks/' },
-          { text: '진행 중인 업무', link: '/tasks/in-progress' },
-          { text: '알려진 이슈', link: '/tasks/known-issues' }
-        ]
-      },
-      {
-        text: '기타',
-        items: [
-          { text: '연락처', link: '/contacts' },
-          { text: 'FAQ', link: '/faq' }
-        ]
-      }
-    ],
+    // 경로 prefix 별로 사이드바가 통째로 바뀐다
+    sidebar: {
+      ...Object.fromEntries(projects.map((p) => [`/${p.slug}/`, projectSidebar(p)])),
+      '/guide/': [{ text: '문서 사이트', items: [{ text: '수정 및 배포', link: '/guide/' }] }]
+    },
 
     search: {
       provider: 'local',

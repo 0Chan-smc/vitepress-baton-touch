@@ -1,6 +1,14 @@
-# 배포
+# 문서 사이트 운영
 
-## 이 문서 사이트 배포
+이 페이지는 인수인계 문서 사이트 자체(모든 프로젝트 공통)의 수정·배포 방법을 다룹니다.
+
+## 문서 수정
+
+- 각 프로젝트 문서는 `docs/project-*/` 아래에 있습니다.
+- `npm run docs:dev`로 로컬에서 확인한 뒤 배포합니다.
+- 새 프로젝트 추가: 기존 프로젝트 폴더를 복사하고 `.vitepress/config.mts`의 `projects` 배열에 한 줄 추가합니다.
+
+## 배포
 
 이 인수인계 문서는 VitePress로 빌드해 **S3**에 올리고, **CloudFront**로 서비스합니다.
 CloudFront Functions(viewer-request)가 Basic Auth를 검사하고, `/path` 형태의 URL을 `/path.html`로 바꿉니다.
@@ -48,13 +56,3 @@ S3_BUCKET=my-bucket CF_DISTRIBUTION_ID=E123ABC npm run deploy
 비밀번호는 `terraform.tfstate`에 평문으로 남습니다. state 파일은 공유하지 말고, 여럿이 관리한다면 암호화된 원격 backend(`infra/versions.tf` 주석 참고)를 사용하세요.
 :::
 
-## 서비스 배포
-
-::: warning TODO
-실제 서비스의 배포 절차(환경별, 롤백 방법 포함)를 작성해 주세요.
-:::
-
-| 환경 | 배포 방법 | 트리거 | 승인자 | 롤백 방법 |
-| --- | --- | --- | --- | --- |
-| 운영 | | | | |
-| 스테이징 | | | | |

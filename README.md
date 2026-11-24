@@ -22,7 +22,10 @@ npm run docs:dev        # http://localhost:5173
 ```
 .vitepress/config.mts   사이트 설정 (nav, sidebar, 검색, 한국어 라벨)
 docs/                   문서 원본 (srcDir)
-  overview/ setup/ operations/ tasks/ contacts.md faq.md
+  index.md              프로젝트 선택 홈
+  project-a/            A 프로젝트 문서 (index, overview/, setup/, operations/, tasks/, contacts, faq)
+  project-b/ project-c/ 같은 구성
+  guide/                문서 사이트 수정·배포 방법 (공통)
 infra/                  Terraform: S3, OAC, CloudFront, CloudFront Function
 scripts/deploy.sh       배포 스크립트
 scripts/test-cf-function.mjs
@@ -32,7 +35,9 @@ scripts/test-cf-function.mjs
 
 - 채워야 할 곳은 `::: warning TODO` 블록과 `<!-- -->` 주석으로 표시되어 있습니다. 내용을 채운 뒤 TODO 블록을 지우세요.
 - 비밀번호, 토큰 같은 비밀 값은 문서에 쓰지 말고 보관 위치만 적으세요.
-- 새 페이지를 추가하면 `.vitepress/config.mts`의 `sidebar`에도 등록하세요.
+- 상단 탭은 프로젝트별로 나뉘고, 탭을 바꾸면 좌측 사이드바가 그 프로젝트 것으로 바뀝니다(`/project-a/...` 경로 기준).
+- 새 프로젝트 추가: `docs/project-a`를 복사해 이름을 바꾸고(문서 안의 `/project-a/` 링크도 함께 치환), `.vitepress/config.mts`의 `projects` 배열에 한 줄 추가합니다. 홈(`docs/index.md`)의 카드도 추가하세요.
+- 새 페이지를 추가하면 `.vitepress/config.mts`의 `projectSidebar()`에도 등록하세요.
 - 이미지는 `docs/public/`에 넣고 `/파일명.png`로 참조합니다.
 
 ## 배포
