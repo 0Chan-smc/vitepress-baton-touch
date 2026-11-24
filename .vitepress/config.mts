@@ -89,6 +89,9 @@ export default defineConfig({
   },
 
   themeConfig: {
+    // 우측 상단 GitHub 아이콘 → 이 문서 사이트 저장소
+    socialLinks: [{ icon: 'github', link: 'https://github.com/0Chan-smc/vitepress-baton-touch', ariaLabel: 'GitHub 저장소' }],
+
     nav: [
       ...projects.map((p) => ({
         text: p.name,
