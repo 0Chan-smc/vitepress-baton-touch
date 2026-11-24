@@ -8,13 +8,27 @@
     "docs:dev": "vitepress dev",
     "docs:build": "vitepress build",
     "docs:preview": "vitepress preview",
+    "build:lambda": "node scripts/build-lambda.mjs",
+    "infra:apply": "npm run build:lambda && terraform -chdir=infra apply",
+    "test": "npm run test:cf && npm run test:chat && npm run typecheck",
     "test:cf": "node scripts/test-cf-function.mjs",
+    "test:chat": "node scripts/test-chat-handler.mjs",
+    "typecheck": "tsc -p infra/lambda/tsconfig.json",
     "deploy": "bash scripts/deploy.sh"
   },
   "devDependencies": {
-    "vitepress": "^1.6.3"
+    "@aws-sdk/client-secrets-manager": "^3.1176.0",
+    "@types/node": "^26.6.6",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2",
+    "vitepress": "^1.6.3",
+    "vitepress-plugin-llms": "^1.15.0"
   },
   "engines": {
     "node": ">=18"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.13.0",
+    "openai": "^7.63.0"
   }
 }

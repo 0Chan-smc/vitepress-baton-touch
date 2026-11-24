@@ -11,3 +11,7 @@ infra/.terraform.lock.hcl.bak
 *.tfvars
 !*.tfvars.example
 crash.log
+
+# 챗봇 Lambda 빌드 산출물
+infra/lambda/.build/
+infra/lambda/chat.zip

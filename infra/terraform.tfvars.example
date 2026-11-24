@@ -11,3 +11,9 @@ basic_auth_password = "change-me"
 # acm_certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/xxxx"
 
 # price_class = "PriceClass_200"
+
+# 문서 Q&A 챗봇 (기본값 사용 시 생략 가능)
+# chat_enabled  = true
+# chat_provider = "openai"      # openai | anthropic
+# chat_model    = "gpt-6-luna"  # 생략 시 제공사 기본값 (openai: gpt-6-luna, anthropic: claude-opus-5-5)
+# chat_effort   = "low"

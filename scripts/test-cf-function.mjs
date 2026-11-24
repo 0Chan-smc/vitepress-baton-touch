@@ -24,7 +24,10 @@ const cases = [
   ['/setup/ → /setup/index.html', () => assert.equal(handler(req('/setup/', ok)).uri, '/setup/index.html')],
   ['/setup/accounts → .html', () => assert.equal(handler(req('/setup/accounts', ok)).uri, '/setup/accounts.html')],
   ['/assets/app.js 유지', () => assert.equal(handler(req('/assets/app.js', ok)).uri, '/assets/app.js')],
-  ['/404.html 유지', () => assert.equal(handler(req('/404.html', ok)).uri, '/404.html')]
+  ['/404.html 유지', () => assert.equal(handler(req('/404.html', ok)).uri, '/404.html')],
+  ['/llms.txt 유지', () => assert.equal(handler(req('/llms.txt', ok)).uri, '/llms.txt')],
+  ['/api/chat 인증 시 경로 유지 (재작성 안 함)', () => assert.equal(handler(req('/api/chat', ok)).uri, '/api/chat')],
+  ['/api/chat 미인증 → 401', () => assert.equal(handler(req('/api/chat')).statusCode, 401)]
 ]
 
 let failed = 0

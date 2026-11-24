@@ -19,6 +19,10 @@ function handler(event) {
   }
 
   var uri = request.uri;
+  // 챗봇 API (Lambda origin) 는 인증만 하고 경로는 그대로 전달
+  if (uri.startsWith('/api/')) {
+    return request;
+  }
   if (uri.endsWith('/')) {
     request.uri = uri + 'index.html';
   } else {

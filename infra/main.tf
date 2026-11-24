@@ -90,6 +90,48 @@ resource "aws_cloudfront_distribution" "docs" {
     origin_access_control_id = aws_cloudfront_origin_access_control.docs.id
   }
 
+  # 문서 Q&A 챗봇 API (chat.tf)
+  dynamic "origin" {
+    for_each = var.chat_enabled ? [1] : []
+    content {
+      origin_id   = "lambda-chat"
+      domain_name = local.chat_origin_domain
+
+      custom_origin_config {
+        http_port              = 80
+        https_port             = 443
+        origin_protocol_policy = "https-only"
+        origin_ssl_protocols   = ["TLSv1.2"]
+        origin_read_timeout    = 60
+      }
+
+      custom_header {
+        name  = "x-origin-secret"
+        value = random_password.origin_secret[0].result
+      }
+    }
+  }
+
+  dynamic "ordered_cache_behavior" {
+    for_each = var.chat_enabled ? [1] : []
+    content {
+      path_pattern             = "/api/*"
+      target_origin_id         = "lambda-chat"
+      viewer_protocol_policy   = "redirect-to-https"
+      allowed_methods          = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
+      cached_methods           = ["GET", "HEAD"]
+      compress                 = false # 스트리밍 응답을 버퍼링 없이 전달
+      cache_policy_id          = data.aws_cloudfront_cache_policy.caching_disabled.id
+      origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer_except_host.id
+
+      # 같은 함수로 Basic Auth 검사 (/api/ 경로는 URI 재작성 안 함)
+      function_association {
+        event_type   = "viewer-request"
+        function_arn = aws_cloudfront_function.auth.arn
+      }
+    }
+  }
+
   default_cache_behavior {
     target_origin_id       = "s3-docs"
     viewer_protocol_policy = "redirect-to-https"

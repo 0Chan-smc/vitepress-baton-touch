@@ -43,3 +43,40 @@ variable "price_class" {
   type        = string
   default     = "PriceClass_200"
 }
+
+# ---------------------------------------------------------------------------
+# 문서 Q&A 챗봇
+# ---------------------------------------------------------------------------
+variable "chat_enabled" {
+  description = "문서 Q&A 챗봇(Lambda + /api/*) 배포 여부"
+  type        = bool
+  default     = true
+}
+
+variable "chat_provider" {
+  description = "챗봇 LLM 제공사 (openai | anthropic)"
+  type        = string
+  default     = "openai"
+
+  validation {
+    condition     = contains(["openai", "anthropic"], var.chat_provider)
+    error_message = "chat_provider 는 openai 또는 anthropic 이어야 합니다."
+  }
+}
+
+variable "chat_model" {
+  description = "모델 ID. 비워두면 제공사 기본값 (openai: gpt-6-luna, anthropic: claude-opus-5-5)"
+  type        = string
+  default     = null
+}
+
+variable "chat_effort" {
+  description = "추론 effort 수준 (low | medium | high | xhigh | max). 문서 Q&A 는 low 로 충분"
+  type        = string
+  default     = "low"
+
+  validation {
+    condition     = contains(["low", "medium", "high", "xhigh", "max"], var.chat_effort)
+    error_message = "chat_effort 는 low, medium, high, xhigh, max 중 하나여야 합니다."
+  }
+}

@@ -1,12 +1,11 @@
 import { defineConfig, type DefaultTheme } from 'vitepress'
+import llmstxt, { copyOrDownloadAsMarkdownButtons } from 'vitepress-plugin-llms'
+import { projects } from './projects.mjs'
 
-// 프로젝트 목록: 상단 탭과 프로젝트별 사이드바가 여기서 생성된다.
-// 새 프로젝트 추가 = docs/project-a 폴더를 복사하고 여기에 한 줄 추가.
-const projects = [
-  { slug: 'project-a', name: 'A 프로젝트' },
-  { slug: 'project-b', name: 'B 프로젝트' },
-  { slug: 'project-c', name: 'C 프로젝트' }
-]
+// 로컬 개발 시 챗봇 API 프록시 (선택)
+//   CHAT_API_URL=https://xxxx.cloudfront.net CHAT_BASIC_AUTH=user:pass npm run docs:dev
+const chatApiUrl = process.env.CHAT_API_URL
+const chatBasicAuth = process.env.CHAT_BASIC_AUTH
 
 // 프로젝트 공통 사이드바 구성 (문서 구성이 다른 프로젝트는 여기서 분기)
 function projectSidebar({ slug }: { slug: string }): DefaultTheme.SidebarItem[] {
@@ -63,6 +62,31 @@ export default defineConfig({
   description: '프로젝트 인수인계 문서',
   cleanUrls: true, // CloudFront Function이 /path → /path.html 로 재작성
   lastUpdated: true,
+
+  vite: {
+    // /llms.txt, /llms-full.txt, 페이지별 .md 생성
+    plugins: [llmstxt()],
+    server: chatApiUrl
+      ? {
+          proxy: {
+            '/api': {
+              target: chatApiUrl,
+              changeOrigin: true,
+              headers: chatBasicAuth
+                ? { Authorization: 'Basic ' + Buffer.from(chatBasicAuth).toString('base64') }
+                : {}
+            }
+          }
+        }
+      : undefined
+  },
+
+  markdown: {
+    // 각 문서 제목 아래에 "페이지 복사" 버튼 삽입 (컴포넌트는 theme/index.ts 에서 등록)
+    config(md) {
+      md.use(copyOrDownloadAsMarkdownButtons, { componentName: 'CopyPageButtons' })
+    }
+  },
 
   themeConfig: {
     nav: [

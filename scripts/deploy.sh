@@ -44,4 +44,18 @@ aws cloudfront create-invalidation \
   --paths "/*" \
   --query 'Invalidation.Id' --output text
 
+# 챗봇이 켜져 있으면 Lambda 의 문서 컨텍스트도 최신 문서로 갱신
+CHAT_LAMBDA_NAME="${CHAT_LAMBDA_NAME:-$(tf_output chat_lambda_name || true)}"
+if [[ -n "$CHAT_LAMBDA_NAME" ]]; then
+  echo "▶ 챗봇 Lambda 문서 컨텍스트 갱신 ($CHAT_LAMBDA_NAME)"
+  npm run build:lambda
+  ZIP_FILE="infra/lambda/chat.zip"
+  rm -f "$ZIP_FILE"
+  (cd infra/lambda/.build && zip -qr ../chat.zip .)
+  aws lambda update-function-code \
+    --function-name "$CHAT_LAMBDA_NAME" \
+    --zip-file "fileb://$ZIP_FILE" \
+    --query 'LastModified' --output text
+fi
+
 echo "✔ 배포 완료: s3://$S3_BUCKET"
