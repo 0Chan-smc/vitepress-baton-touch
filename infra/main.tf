@@ -72,6 +72,55 @@ resource "aws_cloudfront_origin_access_control" "docs" {
   signing_protocol                  = "sigv4"
 }
 
+# 보안 응답 헤더 (HSTS, 프레임 금지, CSP 등)
+# CSP 의 'unsafe-inline' 은 VitePress 인라인 스크립트(다크모드 판별 등)와 인라인 스타일 때문에 필요
+resource "aws_cloudfront_response_headers_policy" "security" {
+  name    = "${var.project_name}-security-headers"
+  comment = "Security headers for ${var.project_name} docs"
+
+  security_headers_config {
+    strict_transport_security {
+      access_control_max_age_sec = 63072000
+      include_subdomains         = true
+      override                   = true
+    }
+    frame_options {
+      frame_option = "DENY"
+      override     = true
+    }
+    content_type_options {
+      override = true
+    }
+    referrer_policy {
+      referrer_policy = "strict-origin-when-cross-origin"
+      override        = true
+    }
+    content_security_policy {
+      content_security_policy = join("; ", [
+        "default-src 'self'",
+        "script-src 'self' 'unsafe-inline'",
+        "style-src 'self' 'unsafe-inline'",
+        "img-src 'self' data:",
+        "font-src 'self' data:",
+        "connect-src 'self'",
+        "frame-ancestors 'none'",
+        "base-uri 'self'",
+        "form-action 'self'",
+        "object-src 'none'",
+      ])
+      override = true
+    }
+  }
+
+  custom_headers_config {
+    items {
+      header   = "Permissions-Policy"
+      value    = "camera=(), microphone=(), geolocation=()"
+      override = true
+    }
+  }
+}
+
 data "aws_cloudfront_cache_policy" "caching_optimized" {
   name = "Managed-CachingOptimized"
 }
@@ -115,14 +164,15 @@ resource "aws_cloudfront_distribution" "docs" {
   dynamic "ordered_cache_behavior" {
     for_each = var.chat_enabled ? [1] : []
     content {
-      path_pattern             = "/api/*"
-      target_origin_id         = "lambda-chat"
-      viewer_protocol_policy   = "redirect-to-https"
-      allowed_methods          = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
-      cached_methods           = ["GET", "HEAD"]
-      compress                 = false # 스트리밍 응답을 버퍼링 없이 전달
-      cache_policy_id          = data.aws_cloudfront_cache_policy.caching_disabled.id
-      origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer_except_host.id
+      path_pattern               = "/api/*"
+      target_origin_id           = "lambda-chat"
+      viewer_protocol_policy     = "redirect-to-https"
+      allowed_methods            = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
+      cached_methods             = ["GET", "HEAD"]
+      compress                   = false # 스트리밍 응답을 버퍼링 없이 전달
+      cache_policy_id            = data.aws_cloudfront_cache_policy.caching_disabled.id
+      origin_request_policy_id   = data.aws_cloudfront_origin_request_policy.all_viewer_except_host.id
+      response_headers_policy_id = aws_cloudfront_response_headers_policy.security.id
 
       # 같은 함수로 Basic Auth 검사 (/api/ 경로는 URI 재작성 안 함)
       function_association {
@@ -133,12 +183,13 @@ resource "aws_cloudfront_distribution" "docs" {
   }
 
   default_cache_behavior {
-    target_origin_id       = "s3-docs"
-    viewer_protocol_policy = "redirect-to-https"
-    allowed_methods        = ["GET", "HEAD", "OPTIONS"]
-    cached_methods         = ["GET", "HEAD"]
-    compress               = true
-    cache_policy_id        = data.aws_cloudfront_cache_policy.caching_optimized.id
+    target_origin_id           = "s3-docs"
+    viewer_protocol_policy     = "redirect-to-https"
+    allowed_methods            = ["GET", "HEAD", "OPTIONS"]
+    cached_methods             = ["GET", "HEAD"]
+    compress                   = true
+    cache_policy_id            = data.aws_cloudfront_cache_policy.caching_optimized.id
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.security.id
 
     function_association {
       event_type   = "viewer-request"

@@ -85,7 +85,9 @@ resource "aws_lambda_function" "chat" {
   filename         = data.archive_file.chat[0].output_path
   source_code_hash = data.archive_file.chat[0].output_base64sha256
   memory_size      = 512
-  timeout          = 120
+  # 동시 처리 질문 수 상한 (비용 폭주 방지). 초과 요청은 Lambda 가 거절
+  reserved_concurrent_executions = var.chat_max_concurrency
+  timeout                        = 120
 
   environment {
     variables = {

@@ -17,6 +17,7 @@ basic_auth_password = "change-me"
 # chat_provider = "openai"      # openai | anthropic
 # chat_model    = "gpt-6-luna"  # 생략 시 제공사 기본값 (openai: gpt-6-luna, anthropic: claude-opus-5-5)
 # chat_effort   = "low"
+# chat_max_concurrency = 3     # 동시에 처리하는 질문 수 상한 (비용 폭주 방지)
 
 # GitHub Actions 문서 자동 배포 (비워두면 배포 role 을 만들지 않음)
 # github_repository           = "my-org/my-handover-docs"

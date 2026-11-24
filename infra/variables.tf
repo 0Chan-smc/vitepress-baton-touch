@@ -70,6 +70,12 @@ variable "chat_model" {
   default     = null
 }
 
+variable "chat_max_concurrency" {
+  description = "챗봇 Lambda 동시 실행 상한 (비용 폭주 방지). 계정 미예약 동시성이 100 이상 남아야 함"
+  type        = number
+  default     = 3
+}
+
 variable "chat_effort" {
   description = "추론 effort 수준 (low | medium | high | xhigh | max). 문서 Q&A 는 low 로 충분"
   type        = string

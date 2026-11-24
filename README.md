@@ -135,6 +135,16 @@ npm run deploy
 - 없는 경로는 S3가 403을 반환합니다. CloudFront가 이를 `/404.html`(응답 코드 404)로 바꿉니다.
 - `assets/`는 1년 immutable로 캐시하고, HTML은 `no-cache`로 둔 뒤 배포할 때마다 `/*`를 무효화합니다.
 
+
+### 보안 응답 헤더
+
+CloudFront 응답 헤더 정책(`infra/main.tf`의 `aws_cloudfront_response_headers_policy.security`)이 모든 응답(401 포함)에 아래 헤더를 붙입니다.
+
+- `Strict-Transport-Security` (2년, 하위 도메인 포함)
+- `X-Frame-Options: DENY`, CSP `frame-ancestors 'none'`: 다른 사이트에 iframe으로 넣지 못하게 막습니다.
+- `Content-Security-Policy`: 같은 출처의 스크립트, 스타일, 이미지만 허용합니다. VitePress 인라인 스크립트 때문에 `'unsafe-inline'`은 허용합니다. 외부 스크립트나 이미지를 문서에 넣으려면 CSP를 함께 고쳐야 합니다.
+- `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`(카메라·마이크·위치 차단)
+
 ## AI 기능
 
 ### 문서 Q&A 챗봇
@@ -163,6 +173,10 @@ npm run deploy
   - CloudFront만 아는 `x-origin-secret` 헤더가 없으면 Lambda가 403을 반환하므로, Function URL을 직접 호출할 수 없습니다.
 - **제한**: 질문은 2,000자 이하, 대화는 최근 20개 메시지까지 보냅니다.
 - **끄기**: `chat_enabled = false`로 두고 apply합니다. 위젯은 남지만 API가 없으므로 연결 오류를 표시합니다.
+- **비용 상한**
+  - **동시 처리 제한**: 챗봇 Lambda는 동시에 최대 `chat_max_concurrency`(기본 3)개 질문만 처리합니다. 초과 요청은 거절되고 위젯에 오류로 표시됩니다.
+  - **월 예산 (직접 설정)**: OpenAI 대시보드 → 해당 프로젝트 → Limits에서 월 예산(budget)과 알림 기준을 정합니다. Anthropic을 쓰면 Console의 Limits에서 설정합니다. 예산을 넘으면 API가 거절하므로 비용이 더 늘지 않습니다.
+  - **사용량 확인**: CloudWatch 로그 `/aws/lambda/<project>-chat`의 `chat.done` 항목에 요청별 토큰 사용량이 남습니다.
 - **로컬 개발**: 배포된 API를 프록시로 연결해 씁니다.
 
   ```bash
