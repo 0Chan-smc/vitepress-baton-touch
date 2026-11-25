@@ -2,6 +2,22 @@ import { defineConfig, type DefaultTheme } from 'vitepress'
 import llmstxt, { copyOrDownloadAsMarkdownButtons } from 'vitepress-plugin-llms'
 import { projects } from './projects.mjs'
 
+// VitePress 기본 slugify와 같은 규칙에 마지막 NFC 정규화만 더한다
+const rControl = /[\u0000-\u001f]/g
+const rSpecial = /[\s~`!@#$%^&*()\-_+=[\]{}|\\;:"'“”‘’<>,.?/]+/g
+const rCombining = /[\u0300-\u036F]/g
+const slugify = (str: string): string =>
+  str
+    .normalize('NFKD')
+    .replace(rCombining, '')
+    .replace(rControl, '')
+    .replace(rSpecial, '-')
+    .replace(/-{2,}/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/^(\d)/, '_$1')
+    .toLowerCase()
+    .normalize('NFC')
+
 // 로컬 개발 시 챗봇 API 프록시 (선택)
 //   CHAT_API_URL=https://xxxx.cloudfront.net CHAT_BASIC_AUTH=user:pass npm run docs:dev
 const chatApiUrl = process.env.CHAT_API_URL
@@ -82,6 +98,10 @@ export default defineConfig({
   },
 
   markdown: {
+    // 제목 id(앵커)를 NFC로 만든다.
+    // VitePress 기본 slugify는 NFKD로 정규화해 한글이 자모로 분해되므로,
+    // 문서에 직접 쓴 [링크](#한글-제목)와 id가 달라 이동이 안 된다.
+    anchor: { slugify },
     // 각 문서 제목 아래에 "페이지 복사" 버튼 삽입 (컴포넌트는 theme/index.ts 에서 등록)
     config(md) {
       md.use(copyOrDownloadAsMarkdownButtons, { componentName: 'CopyPageButtons' })
