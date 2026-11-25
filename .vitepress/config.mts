@@ -1,3 +1,5 @@
+import { writeFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { defineConfig, type DefaultTheme } from 'vitepress'
 import llmstxt, { copyOrDownloadAsMarkdownButtons } from 'vitepress-plugin-llms'
 import { projects } from './projects.mjs'
@@ -17,6 +19,9 @@ const slugify = (str: string): string =>
     .replace(/^(\d)/, '_$1')
     .toLowerCase()
     .normalize('NFC')
+
+// 배포마다 바뀌는 빌드 ID (theme/version-check.ts 가 /version.json 과 비교)
+const buildId = process.env.GITHUB_SHA || new Date().toISOString()
 
 // 로컬 개발 시 챗봇 API 프록시 (선택)
 //   CHAT_API_URL=https://xxxx.cloudfront.net CHAT_BASIC_AUTH=user:pass npm run docs:dev
@@ -78,8 +83,15 @@ export default defineConfig({
   description: '프로젝트 인수인계 문서',
   cleanUrls: true, // CloudFront Function이 /path → /path.html 로 재작성
   lastUpdated: true,
+  head: [['link', { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }]],
+
+  // 빌드 ID 를 dist/version.json 으로 남긴다 (deploy.sh 가 no-cache 로 업로드)
+  buildEnd(siteConfig) {
+    writeFileSync(join(siteConfig.outDir, 'version.json'), JSON.stringify({ build: buildId }))
+  },
 
   vite: {
+    define: { __BUILD_ID__: JSON.stringify(buildId) },
     // /llms.txt, /llms-full.txt, 페이지별 .md 생성
     plugins: [llmstxt()],
     server: chatApiUrl

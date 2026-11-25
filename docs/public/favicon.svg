@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <style>
+    .doc { fill: #fff; stroke: #000; stroke-width: 2; stroke-linejoin: round }
+    .line { fill: #000 }
+    .arrow { fill: #000; stroke: #fff; stroke-width: 2; stroke-linejoin: round; paint-order: stroke }
+    @media (prefers-color-scheme: dark) {
+      .doc { fill: #000; stroke: #fff }
+      .line { fill: #fff }
+      .arrow { fill: #fff; stroke: #000 }
+    }
+  </style>
+  <!-- 문서: 오른쪽 위 모서리가 접힌 종이 (흰 바탕 + 검은 테두리) -->
+  <path class="doc" d="M5 5a2 2 0 0 1 2-2h10l6 6v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z"/>
+  <path class="doc" d="M17 3v6h6"/>
+  <rect class="line" x="9" y="12" width="9" height="2" rx="1"/>
+  <rect class="line" x="9" y="16.5" width="7" height="2" rx="1"/>
+  <!-- 넘겨주는 화살표 -->
+  <path class="arrow" d="M13 22.5h10v-4l7 6.5-7 6.5v-4H13z"/>
+</svg>
